@@ -40,8 +40,6 @@ plt.ylabel("Concentration")
 plt.title("Concentration vs Time for a Reversible Reaction with Noise")
 plt.legend()
 plt.show()
-このコードでは、noise_std変数によってガウスノイズの標準偏差を指定します。標準偏差を増減させることで、ゆらぎの程度を調整できます。注意すべき点として、ノイズの影響により濃度が負の値になる場合があります。現実の実験では濃度が負になることはありませんので、これを考慮してノイズの程度を適切に選択してください。
-
 
 
 
