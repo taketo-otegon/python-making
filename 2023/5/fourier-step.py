@@ -52,6 +52,6 @@ def update(n_max):
 # アニメーションの作成
 ani = FuncAnimation(fig, update, frames=range(1,101), interval=100)
 
-ani.save("plot-fourier-step.gif", writer="imagemagick")
+ani.save("./2023/5/plot-fourier-step.gif", writer="imagemagick")
 # アニメーションの表示
 plt.show()
