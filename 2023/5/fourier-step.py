@@ -38,7 +38,8 @@ x = np.linspace(-L/2, L/2, 1000)
 # グラフの設定
 fig, ax = plt.subplots()
 line1, = ax.plot(x, f(x), label='f(x)')
-line2, = ax.plot([], [], label='step n = 0') 
+line2, = ax.plot([], [], label='step fourier') 
+
 ax.set_ylim(-0.5,1.5)
 ax.legend()
 
