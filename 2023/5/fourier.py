@@ -2,51 +2,52 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-# 関数 f(x) の定義
-def f(x):
-    return np.sin(x) + np.cos(3*x) + np.sin(5*x)
+def rectangular_signal(t, T):
+    return np.where(np.abs(t) < T/2, 1, 0)
 
-# フーリエ係数の計算
-def fourier_coefficients(n, T):
-    t = np.linspace(-T/2, T/2, 1000)
-    y = f(t)
-    dt = T/len(t)
-
-    a0 = (2/T) * np.sum(y) * dt
-    an = lambda n: (2/T) * np.sum(y * np.cos(2 * np.pi * n * t / T)) * dt
-    bn = lambda n: (2/T) * np.sum(y * np.sin(2 * np.pi * n * t / T)) * dt
-
-    return a0, an, bn
-
-# フーリエ級数展開
-def fourier_series(x, n_max, T, a0, an, bn):
-    result = a0/2
-    for n in range(1, n_max + 1):
-        result += an(n) * np.cos(2 * np.pi * n * x / T) + bn(n) * np.sin(2 * np.pi * n * x / T)
-    return result
+def fourier_transform(signal, dt):
+    N = len(signal)
+    frequencies = np.fft.fftfreq(N, dt)
+    spectrum = np.fft.fft(signal)
+    spectrum /= N  # スケーリング係数の正規化
+    return frequencies, np.abs(spectrum)
 
 # パラメータ設定
-n_max = 10
-T = 2 * np.pi
-x = np.linspace(-T/2, T/2, 1000)
+T_max = 1.0  # 矩形信号の最大幅
+dt = 0.001  # 時間刻み
+t = np.arange(-10, 10, dt)  # 時間軸
 
-# プロット設定
-fig, ax = plt.subplots()
-ax.set_xlim(-T/2, T/2)
-ax.set_ylim(-2, 2)
-line1, = ax.plot(x, f(x), label='f(x)')
-line, = ax.plot(x, np.zeros_like(x),label='Fourier series')
-ax.legend()
+# プロットの準備
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 10))
 
+# グラフの初期化
+line1, = ax1.plot([], [])
+ax1.set_xlim(t[0], t[-1])
+ax1.set_ylim(0, 1.5)
+ax1.set_xlabel('Time')
+ax1.set_ylabel('Amplitude')
+ax1.set_title('Rectangular Signal')
 
-a0, an, bn = fourier_coefficients(n_max, T)
+line2, = ax2.plot([], [])
+ax2.set_xlim(-10, 10)
+ax2.set_ylim(0, 0.05)
+ax2.set_xlabel('Frequency')
+ax2.set_ylabel('Magnitude')
+ax2.set_title('Fourier Transform')
+ax2.grid(True)
+# プロットの更新関数
+def update(frame):
+    T = T_max * (1 - frame/100)  # 矩形信号の幅を短くする
+    signal = rectangular_signal(t, T)
+    frequencies, spectrum = fourier_transform(signal, dt)
 
-def update(num):
-    line.set_ydata(fourier_series(x, num, T, a0, an, bn))
-    ax.set_title('n_max = {}'.format(num))
-    return line,ax
+    line1.set_data(t, signal)
+    line2.set_data(frequencies, spectrum)
+    return line1, line2
 
-# アニメーション
-ani = FuncAnimation(fig, update, frames=range(n_max+1), interval=500)
-
+# アニメーションの生成
+animation = FuncAnimation(fig, update, frames=99, interval=50, blit=True ,repeat=False)
+animation.save("./2023/5/plot-fourier-real.gif", writer="imagemagick")
+# アニメーションの表示
+plt.tight_layout()
 plt.show()
